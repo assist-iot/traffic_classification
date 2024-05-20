@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ml.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "ml.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.ml.autoscaling.enabled }}
+  replicas: {{ .Values.ml.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ml.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ml.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.ml.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.enablerNodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if not .Values.enablerNodeSelector }}
+        {{- with .Values.ml.nodeSelector }}
+      nodeSelector:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.ml.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ml.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.ml.podSecurityContext | nindent 8 }}
+      containers:
+        - name: ml
+          securityContext:
+            {{- toYaml .Values.ml.securityContext | nindent 12 }}
+          image: "{{ .Values.ml.image.repository }}:{{ .Values.ml.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ml.image.pullPolicy }}
+          ports:
+            - name: ml
+              containerPort: {{ .Values.ml.service.ports.ml.containerPort }}
+              protocol: {{ .Values.ml.service.ports.ml.protocol }}
+          volumeMounts:
+            - mountPath: /ML_folder
+              name: ml-folder
+          resources:
+            {{- toYaml .Values.ml.resources | nindent 12 }}
+          {{- with .Values.ml.envVars }}
+          env:
+            - name: ML_PORT
+              value: {{ .mlPort | quote }}
+            - name: BASE_FOLDER
+              value: {{ .baseFolder | quote }}
+          {{- end }}
+      volumes:
+        - name: ml-folder
+          hostPath:
+            path: {{ .Values.ml.volume.hostPath }}
+            type: Directory

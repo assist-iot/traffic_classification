@@ -1,0 +1,6 @@
+apiVersion: v3
+appVersion: 2.0.0
+description: Traffic classification Helm chart
+name: traffic-classification
+type: application
+version: 2.0.0

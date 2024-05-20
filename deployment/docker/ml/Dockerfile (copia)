@@ -1,0 +1,32 @@
+#Deriving the latest base image
+FROM python:3.9.12-bullseye
+
+#Labels as key value pair
+LABEL Maintainer="alforlea@upv.es"
+# Any working directory can be chosen as per choice like '/' or '/home' etc
+
+ENV TZ=Europe/Madrid
+ENV ML_PORT=10111
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+RUN echo $TZ > /etc/timezone
+
+# i have chosen /usr/app/src
+WORKDIR /app
+
+#to COPY the remote file at working directory in container
+COPY . ./
+
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update
+RUN apt -y install python3-pip
+RUN apt -y install openjdk-11-jdk
+RUN pip3 install -r requirements.txt
+RUN pip3 uninstall --yes mpmath
+RUN pip3 install mpmath==1.2.1
+
+# configure the container to run in an executed manner
+# Next volume will include /model, /data and /preprocessed folders
+#VOLUME /ML_folder
+ENTRYPOINT [ "python3" ]
+CMD ["view.py" ]

@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "Resource-provisioning enabler",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "x-logo": {
+      "url": "https://redocly.github.io/openapi-template/logo.png"
+    },
+    "description": "OpenAPI\n"
+  },
+  "tags": [
+    {
+      "name": "v1",
+      "description": "API V1 OpenAPI\n"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Common endpoints"
+        ],
+        "summary": "Get health status",
+        "description": "Get `health` status",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Healthy"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unhealthy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "Common endpoints"
+        ],
+        "summary": "Get version",
+        "description": "Get `version`",
+        "operationId": "version",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Healthy": {
+        "type": "object",
+        "properties": {
+          "health": {
+            "description": "healthy",
+            "type": "string",
+            "example": "healthy"
+          }
+        }
+      },
+      "Unhealthy": {
+        "type": "object",
+        "properties": {
+          "health": {
+            "description": "unhealthy",
+            "type": "string",
+            "example": "unhealthy"
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "properties": {
+          "enabler": {
+            "description": "enabler",
+            "type": "string",
+            "example": "resource-provisioning"
+          },
+          "version": {
+            "description": "version",
+            "type": "string",
+            "example": "0.1.0"
+          }
+        }
+      }
+    }
+  }
+}

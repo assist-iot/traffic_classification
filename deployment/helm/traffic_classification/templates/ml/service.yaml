@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ml.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "ml.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.ml.service.type }}
+  ports:
+    - name: ml
+      port: {{ .Values.ml.service.ports.ml.port }}
+      targetPort: {{ .Values.ml.service.ports.ml.targetPort }}
+      protocol: {{ .Values.ml.service.ports.ml.protocol }}
+      {{- if and (or (eq .Values.ml.service.type "NodePort") (eq .Values.ml.service.type "LoadBalancer")) (not (empty .Values.ml.service.ports.ml.nodePort)) }}
+      nodePort: {{ .Values.ml.service.ports.ml.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "ml.selectorLabels" . | nindent 4 }}

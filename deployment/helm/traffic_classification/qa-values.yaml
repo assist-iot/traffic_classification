@@ -1,0 +1,144 @@
+# Default values for enabler.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# String to partially override enabler.fullname template (will maintain the release name).
+nameOverride: ""
+# String to fully override enabler.fullname template.
+fullnameOverride: ""
+# Deploy all the components in specific K8s node(s).
+enablerNodeSelector: {}
+# Cilium Multi-cluster global service.
+globalService: false
+
+# Component api values.
+api:
+  tier: external
+  replicaCount: 1
+
+  # Configuration of the container image.
+  imagePullSecrets: []
+  image:
+    repository: gitlab.assist-iot.eu:5050/enablers-registry/public/traffic-classification/traffic-api
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+  
+  # Configuration of the service: type and ports.
+  service:
+    type: ClusterIP
+    ports:
+      api:
+        port: 10000
+        targetPort: 10000
+        containerPort: 10000
+        nodePort: ""
+        protocol: TCP
+
+  # The specification of the resources is needed for the proper functioning 
+  # of the Smart Orchestrator enabler (requests)
+  # and of the Resource provisioning enabler (limits).
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    # minReplicas: 1
+    # maxReplicas: 3
+    # targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # Include here the environment variables to be used in containers section of the component's manifest.
+  # TODO: Here and in the manifest is included an example, please adapt them to the requirements of your component.
+  envVars:
+    apiPort: "10000"
+    mlHost: "ml"
+    mlPort: "10111"
+
+  # Configure this parameters to deploy the component in specific K8s node(s).
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Component ml values.
+ml:
+  tier: internal
+  replicaCount: 1
+
+  # Configuration of the container image.
+  imagePullSecrets: []
+  image:
+    repository: gitlab.assist-iot.eu:5050/enablers-registry/public/traffic-classification/traffic
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+  
+  # Configuration of the service: type and ports.
+  service:
+    type: ClusterIP
+    ports:
+      ml:
+        port: 10111
+        targetPort: 10111
+        containerPort: 10111
+        nodePort: ""
+        protocol: TCP
+
+  # The specification of the resources is needed for the proper functioning 
+  # of the Smart Orchestrator enabler (requests)
+  # and of the Resource provisioning enabler (limits).
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    # minReplicas: 1
+    # maxReplicas: 3
+    # targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # Include here the environment variables to be used in containers section of the component's manifest.
+  # TODO: Here and in the manifest is included an example, please adapt them to the requirements of your component.
+  envVars:
+    mlPort: "10111"
+    baseFolder: './ML_folder'
+  volume:
+    hostPath: "/home/traffic"
+
+  # Configure this parameters to deploy the component in specific K8s node(s).
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+

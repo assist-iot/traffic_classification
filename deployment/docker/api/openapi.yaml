@@ -1,0 +1,268 @@
+openapi: 3.0.2
+info:
+  version: '2.0.0'
+
+  title: Traffic classification OpenAPI
+
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  x-logo:
+    url: 'https://redocly.github.io/openapi-template/logo.png'
+  
+paths:
+############################ Common endpoints #################################################
+  /version:
+    get:
+      tags:
+        - Common endpoints
+      summary: Get version
+      description: Get current enabler `version`
+      operationId: getVersion
+      responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json:
+                  schema:
+                      $ref: '#/components/schemas/Version'
+                  example:
+                    name: Traffic classification
+                    version: "2.0.0"
+            '500':
+              description: Internal error
+              content: {}
+                       
+  /v2/api-export:
+    get:
+      tags:
+        - Common endpoints
+      summary: Get OpenAPI documentation
+      description: Returns enabler's OpenAPI documentation
+      operationId: getOpenAPI
+      responses: # list of responses
+            '200':
+              description: Success
+              content:
+                application/json:
+                  example:
+                    openapi: 3.0.2
+                    info:
+                      version: '2.0.0'
+                      title: Traffic classification OpenAPI
+                      license:
+                        name: Apache 2.0
+                        url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+                    ...: ...
+            '500':
+              description: Internal error
+              content: {}
+############################ Enabler endpoints #################################################
+  /v2/preprocess:
+    post:
+      tags:
+        - Data preprocessing
+      summary: Preprocess data located in a local path (attached as volume)
+      responses:
+        '200':
+          description: Data preprocessed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Result:
+                    type: string
+                    example: Pre-processing completed successfully
+        '500':
+          description: Failed to preprocess data
+          content: {}
+
+  /v2/create_train_test_set:
+    post:
+      tags:
+        - Create train and test sets
+      summary: Create train-test set
+      responses:
+        '200':
+          description: Train-test set created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Result:
+                    type: string
+                    example: 'Successfully created'
+        '500':
+          description: Failed to create train-test set
+          content: {}
+
+  /v2/train:
+    post:
+      tags:
+        - Training
+      summary: Train model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model_type:
+                  type: string
+                task:
+                  type: string
+            example:
+              model_type: "cnn"
+              task: "app"
+      responses:
+        '200':
+          description: Model trained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Result:
+                    type: string
+                    example: 'Training of cnn model for app classification has been completed successfully'
+        '500':
+          description: Failed to train model
+          content: {}
+
+  /v2/cnn_inference_app:
+    post:
+      tags:
+        - Inferencing
+      summary: Get predicted app using CNN model
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pcap_file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Returns the predicted app
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  labels:
+                    type: string
+                    example: "{'label': 'Email'}"
+        '500':
+          description: Error occurred during inference
+          content: {}
+
+  /v2/resnet_inference_app:
+    post:
+      tags:
+        - Inferencing
+      summary: Get predicted app using RESNET model
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pcap_file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Returns the predicted app
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  labels:
+                    type: string
+                    example: "{'label': 'Email'}"
+        '500':
+          description: Error occurred during inference
+          content: {}
+
+  /v2/cnn_inference_traffic:
+    post:
+      tags:
+        - Inferencing
+      summary: Get predicted traffic using CNN model
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pcap_file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Returns the predicted traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  labels:
+                    type: string
+                    example: "{'label': 'Chat'}"
+        '500':
+          description: Error occurred during inference
+          content: {}
+
+  /v2/resnet_inference_traffic:
+    post:
+      tags:
+        - Inferencing
+      summary: Get predicted traffic using RESNET model
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pcap_file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Returns the predicted traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  labels:
+                    type: string
+                    example: "{'label': 'Chat'}"
+        '500':
+          description: Error occurred during inference
+          content: {}
+######################### SCHEMAS ####################################################
+# An object to hold reusable parts that can be used across the definition
+components:
+  schemas:
+    Version:
+      type: object
+      properties:
+        enabler:
+          description: Enabler's name
+          type: string
+          maxLength: 128
+        version:
+          description: Current enabler's version
+          type: string
+          maxLength: 128
